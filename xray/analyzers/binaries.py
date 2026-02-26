@@ -16,7 +16,7 @@ _MIN_STRING_LEN = 6
 _MAGIC_BYTES: dict[bytes, str] = {
     b"\x7fELF": "ELF binary (Linux/Unix executable)",
     b"MZ": "PE binary (Windows executable or DLL)",
-    b"\xca\xfe\xba\xbe": "Mach-O binary (macOS/iOS, fat)",
+    b"\xca\xfe\xba\xbe": "Java class file or Mach-O fat binary",
     b"\xce\xfa\xed\xfe": "Mach-O binary (macOS 32-bit)",
     b"\xcf\xfa\xed\xfe": "Mach-O binary (macOS 64-bit)",
     b"PK\x03\x04": "ZIP archive (or JAR/APK/DOCX)",
@@ -28,7 +28,6 @@ _MAGIC_BYTES: dict[bytes, str] = {
     b"GIF87a": "GIF image",
     b"GIF89a": "GIF image",
     b"%PDF": "PDF document",
-    b"CAFEBABE": "Java class file",
 }
 
 

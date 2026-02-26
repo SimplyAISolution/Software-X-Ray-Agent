@@ -16,9 +16,16 @@ app = typer.Typer(
     name="xray",
     help="Software X-Ray Lab – evidence-backed software reconnaissance tool.",
     add_completion=False,
+    invoke_without_command=True,
+    no_args_is_help=True,
 )
 console = Console()
 err_console = Console(stderr=True)
+
+
+@app.callback()
+def _callback(ctx: typer.Context) -> None:
+    """Software X-Ray Lab – evidence-backed software reconnaissance tool."""
 
 
 @app.command("analyze")

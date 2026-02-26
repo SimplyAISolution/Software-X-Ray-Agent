@@ -52,6 +52,12 @@ def load_target(target: str, max_bytes: int = 100 * 1024 * 1024) -> LoadedTarget
         return LoadedTarget(path, cleanup=False, original=target)
 
     if path.is_file():
+        file_size = path.stat().st_size
+        if file_size > max_bytes:
+            raise LoadError(
+                f"Target file size ({file_size:,} bytes) exceeds "
+                f"--max-bytes limit ({max_bytes:,} bytes)."
+            )
         suffix = path.suffix.lower()
         suffixes = "".join(path.suffixes).lower()
         if suffix in _ARCHIVE_SUFFIXES or suffixes in {".tar.gz", ".tar.bz2", ".tar.xz"}:

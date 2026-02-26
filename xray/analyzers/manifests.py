@@ -29,6 +29,8 @@ _MANIFEST_FILES = {
     "pubspec.yaml",
 }
 
+MAX_DEPENDENCIES_TO_REPORT = 20
+
 
 class ManifestAnalyzer(Analyzer):
     name = "manifests"
@@ -140,10 +142,14 @@ class ManifestAnalyzer(Analyzer):
 
         deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
         if deps:
-            dep_list = sorted(deps.keys())[:20]
+            dep_list = sorted(deps.keys())[:MAX_DEPENDENCIES_TO_REPORT]
+            dep_str = (
+                f"npm dependencies (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                f"{', '.join(dep_list)}"
+            )
             claims.append(
                 Claim(
-                    claim=f"npm dependencies (first 20): {', '.join(dep_list)}",
+                    claim=dep_str,
                     label=ClaimLabel.VERIFIED,
                     confidence=100,
                     evidence=EvidencePointer(file_path=rel, manifest_key="dependencies"),
@@ -245,10 +251,16 @@ class ManifestAnalyzer(Analyzer):
                 )
             deps = project.get("dependencies", [])
             if deps:
-                dep_names = sorted([re.split(r"[>=<!;]", d)[0].strip() for d in deps])[:20]
+                dep_names = sorted(
+                    [re.split(r"[>=<!;]", d)[0].strip() for d in deps]
+                )[:MAX_DEPENDENCIES_TO_REPORT]
+                dep_str = (
+                    f"Python dependencies (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(dep_names)}"
+                )
                 claims.append(
                     Claim(
-                        claim=f"Python dependencies (first 20): {', '.join(dep_names)}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(
@@ -300,10 +312,14 @@ class ManifestAnalyzer(Analyzer):
                 )
             deps = data.get("dependencies", {})
             if deps:
-                dep_list = sorted(deps.keys())[:20]
+                dep_list = sorted(deps.keys())[:MAX_DEPENDENCIES_TO_REPORT]
+                dep_str = (
+                    f"Rust dependencies (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(dep_list)}"
+                )
                 claims.append(
                     Claim(
-                        claim=f"Rust dependencies (first 20): {', '.join(dep_list)}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(file_path=rel, manifest_key="dependencies"),
@@ -331,9 +347,13 @@ class ManifestAnalyzer(Analyzer):
                     if pkg:
                         deps.append(pkg)
             if deps:
+                dep_str = (
+                    f"Python requirements (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(sorted(deps[:MAX_DEPENDENCIES_TO_REPORT]))}"
+                )
                 claims.append(
                     Claim(
-                        claim=f"Python requirements (first 20): {', '.join(sorted(deps[:20]))}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(file_path=rel),
@@ -374,9 +394,13 @@ class ManifestAnalyzer(Analyzer):
                 )
             requires = re.findall(r"^\s+(\S+)\s+v[\w.+-]+", text, re.MULTILINE)
             if requires:
+                dep_str = (
+                    f"Go dependencies (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(sorted(requires[:MAX_DEPENDENCIES_TO_REPORT]))}"
+                )
                 claims.append(
                     Claim(
-                        claim=f"Go dependencies (first 20): {', '.join(sorted(requires[:20]))}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(file_path=rel, manifest_key="require"),
@@ -485,9 +509,13 @@ class ManifestAnalyzer(Analyzer):
             text = path.read_text(encoding="utf-8", errors="replace")
             gems = re.findall(r"""gem\s+['"]([^'"]+)['"]""", text)
             if gems:
+                dep_str = (
+                    f"Ruby gems (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(sorted(gems[:MAX_DEPENDENCIES_TO_REPORT]))}"
+                )
                 claims.append(
                     Claim(
-                        claim=f"Ruby gems (first 20): {', '.join(sorted(gems[:20]))}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(file_path=rel),
@@ -528,9 +556,13 @@ class ManifestAnalyzer(Analyzer):
                 )
             packages = re.findall(r'PackageReference\s+Include="([^"]+)"', text)
             if packages:
+                dep_str = (
+                    f".NET NuGet packages (first {MAX_DEPENDENCIES_TO_REPORT}): "
+                    f"{', '.join(sorted(packages[:MAX_DEPENDENCIES_TO_REPORT]))}"
+                )
                 claims.append(
                     Claim(
-                        claim=f".NET NuGet packages (first 20): {', '.join(sorted(packages[:20]))}",
+                        claim=dep_str,
                         label=ClaimLabel.VERIFIED,
                         confidence=100,
                         evidence=EvidencePointer(file_path=rel),
